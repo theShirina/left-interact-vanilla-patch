@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Enable short empty-world click deselection by default and migrate v0.2.1 settings once.
+
 ## [0.2.1] - 2026-08-04
 
 - Use trusted FrameXML actions for seamless held-left steering and W-compatible right-click movement.

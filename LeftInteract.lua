@@ -290,6 +290,10 @@ local function MakeLabel(parent, text, size)
 end
 
 local CHANGELOG_TEXT = [[
+UNRELEASED
+CHANGED
+- Enable short empty-world click deselection by default and migrate v0.2.1 settings once.
+
 v0.2.1 - 2026-08-04
 ADDED
 - Use locally installed trusted FrameXML actions for seamless held-left steering with W-compatible right-click movement.
@@ -622,18 +626,20 @@ controller:SetScript("OnEvent", function()
         if arg1 ~= ADDON_NAME then return end
 
         local firstRun = next(LeftInteractDB) == nil
+        local savedSettingsVersion = tonumber(LeftInteractDB.settingsVersion) or 0
         if LeftInteractDB.enabled == nil then LeftInteractDB.enabled = true end
         if LeftInteractDB.rightMove == nil then LeftInteractDB.rightMove = true end
-        if LeftInteractDB.emptyClickDeselect == nil then LeftInteractDB.emptyClickDeselect = false end
+        if LeftInteractDB.emptyClickDeselect == nil or savedSettingsVersion < 102 then
+            LeftInteractDB.emptyClickDeselect = true
+        end
         if firstRun then
             LeftInteractDB.movementMode = "combined"
         elseif LeftInteractDB.movementMode ~= "independent" and LeftInteractDB.movementMode ~= "combined" then
             LeftInteractDB.movementMode = "combined"
         end
-        local savedSettingsVersion = tonumber(LeftInteractDB.settingsVersion) or 0
         recaptureBindingsOnLogin = savedSettingsVersion < 101
-        if recaptureBindingsOnLogin then
-            LeftInteractDB.settingsVersion = 101
+        if savedSettingsVersion < 102 then
+            LeftInteractDB.settingsVersion = 102
         end
 
         CreateOptionsGUI()

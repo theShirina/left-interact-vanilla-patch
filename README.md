@@ -36,6 +36,7 @@ Back up an existing `patch-Z.MPQ` before replacing it.
 - Releasing right click resumes held-left steering.
 - Ground-target spells use native left-click placement.
 - Native left click returns while an inventory item is attached.
+- Short empty-world clicks clear the current target by default.
 - `/leftinteract recover` restores the recorded mouse bindings.
 
 ## Commands
