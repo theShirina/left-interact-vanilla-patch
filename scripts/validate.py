@@ -191,8 +191,11 @@ def main() -> int:
     require('text.replace("\\r\\n", "\\n").replace("\\r", "\\n")' in addon_builder, "ZIP builder does not canonicalize LF")
 
     require("No client files or MPQs are included" in package_readme, "Package README lacks client-file boundary")
+    require("releases/latest/download/LeftInteractVanilla-v0.2.1.zip" in readme, "Direct addon download missing")
+    require("releases/latest/download/patch-Z.MPQ" in readme, "Direct patch download missing")
+    require("You do not need to download an EXE, Python, or any build tool" in readme, "Simple no-EXE install promise missing")
     require("does **not** contain a game executable" in readme, "Public README lacks source boundary")
-    require("no GlueXML, login, account, or realm-selection code" in readme, "README lacks login/realm exclusion")
+    require("no executable, login code, account data, GlueXML, or realm-selection changes" in readme, "README lacks patch boundary")
     require("never calls `SaveBindings`" in readme, "README lacks binding safety statement")
     require("/leftinteract recover" in readme and "/leftinteract recover" in package_readme, "Recovery command missing")
     require(re.search(r"^## \[0\.2\.1\] - 2026-08-04$", changelog, re.MULTILINE) is not None, "Current changelog entry missing")

@@ -6,7 +6,8 @@
 - Preserve native left-click placement for ground-target spells.
 - Reapply saved settings after account keybindings finish loading.
 - Keep protected movement calls outside addon Lua and never call `SaveBindings`.
-- Add a source-only builder that creates and verifies the required MPQ from the user's own supported client.
+- Publish the addon ZIP and clean one-file MPQ as separate downloads; users need no EXE or build tools.
+- Keep a source-only builder in the repository for audit and maintenance.
 
 ## [0.1.0] - 2026-08-04
 

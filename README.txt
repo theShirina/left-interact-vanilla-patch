@@ -1,52 +1,48 @@
 LEFT INTERACT VANILLA 0.2.1
 ===========================
 
-Open-source Vanilla 1.12.1 port for the Microbot client.
-Targets Interface 11200 and requires the matching FrameXML patch generated
-from the user's own client. No client files or MPQs are included.
-
-FEATURES
+DOWNLOAD
 --------
-- Left click uses trusted LEFTINTERACT_ACTION for native interaction.
-- Shift + left keeps native selection and camera control.
-- Right click uses trusted LEFTINTERACT_COMBINED for W-compatible movement.
-- Held-left steering resumes when right click is released.
-- Ground-target spells use native left-click placement.
-- Native left click returns while an inventory item is attached.
-- Saved settings reapply after account keybindings load.
+Get these two files from:
+https://github.com/theShirina/left-interact-vanilla-patch/releases/latest
 
-REQUIRED FRAMEXML PATCH
------------------------
-Microbot blocks protected movement calls from addon Lua. The repository's
-scripts/build_framexml_patch.py reads Bindings.xml from your own supported
-client and creates Data\patch-Z.MPQ with the two trusted actions.
+1. LeftInteractVanilla-v0.2.1.zip
+2. patch-Z.MPQ
 
-The patch is not included in the addon ZIP. Follow README.md in the repository
-to install pinned dependencies, build the MPQ, and verify its hashes.
-
-BINDING SAFETY
---------------
-Vanilla 1.12 has no temporary override-binding API. This port uses SetBinding
-for the current session and never calls SaveBindings.
-
-It records BUTTON1, BUTTON2, SHIFT-BUTTON1, and SHIFT-BUTTON2 after account
-keybindings load. It restores them when disabled and during logout. Normal
-restoration preserves a newer binding change made by another addon.
-
-Emergency recovery:
-/leftinteract recover
-
-This force-restores the recorded originals and leaves the addon disabled.
-A crash may skip logout, but a full restart reloads the client's saved
-bindings because this addon never saves its session changes.
+No EXE, Python, or build tool is required.
+No client files or MPQs are included in this addon ZIP. The required clean
+one-file MPQ is a separate release download.
 
 INSTALL
 -------
-With WoW closed:
-1. Build patch-Z.MPQ by following the repository README.
-2. Copy patch-Z.MPQ to <Microbot folder>\Data\.
-3. Copy LeftInteract to <Microbot folder>\Interface\AddOns\.
-4. Restart the client.
+Close World of Warcraft first.
+
+1. Extract the addon ZIP into <WoW>\Interface\AddOns\.
+2. Copy patch-Z.MPQ into <WoW>\Data\.
+3. Start the client and open settings with /leftinteract gui.
+
+Expected paths:
+<WoW>\Interface\AddOns\LeftInteract\LeftInteract.toc
+<WoW>\Data\patch-Z.MPQ
+
+Back up an existing patch-Z.MPQ before replacing it.
+
+FEATURES
+--------
+- Left click interacts with NPCs and world objects.
+- Shift + left keeps native selection and camera control.
+- Right click provides W-compatible movement.
+- Held-left steering resumes after right click is released.
+- Ground-target spells use native left-click placement.
+- Native left click returns while an inventory item is attached.
+
+BINDING SAFETY
+--------------
+The addon uses SetBinding for the current session and never calls SaveBindings.
+It restores recorded mouse bindings when disabled and during logout.
+
+Emergency recovery:
+/leftinteract recover
 
 COMMANDS
 --------
@@ -59,14 +55,7 @@ COMMANDS
 /leftinteract rightmove on|off
 /leftinteract movement combined|independent
 
-MOVEMENT
---------
-combined    Trusted W-compatible seamless action. Default.
-independent Legacy MOVEFORWARD fallback. It shares movement state with W.
+The separate patch-Z.MPQ contains only:
+Interface\FrameXML\Bindings.xml
 
-TEST STATUS
------------
-The isolated Microbot client proved trusted loading, seamless held-left
-continuity, W independence, ground-target placement, settings persistence,
-and clean relog behavior. Automated lifecycle, safety, Lua 5.0.3, patch-source,
-and deterministic packaging checks are included in the repository.
+It contains no executable, login code, account data, GlueXML, or realm changes.

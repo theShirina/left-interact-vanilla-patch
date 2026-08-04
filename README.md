@@ -1,8 +1,32 @@
-# Left Interact Vanilla + FrameXML Patch
+# Left Interact Vanilla
 
 Left-click interaction and seamless mouse steering for the Microbot World of Warcraft 1.12.1 client.
 
-This repository contains the Interface 11200 addon and a source-only builder for its required trusted FrameXML patch. It does **not** contain a game executable, client MPQ, extracted Blizzard FrameXML, account data, or login/realm modifications.
+## Downloads
+
+Download these two files from the latest release:
+
+1. **[LeftInteractVanilla-v0.2.1.zip](https://github.com/theShirina/left-interact-vanilla-patch/releases/latest/download/LeftInteractVanilla-v0.2.1.zip)** — addon
+2. **[patch-Z.MPQ](https://github.com/theShirina/left-interact-vanilla-patch/releases/latest/download/patch-Z.MPQ)** — required FrameXML patch
+
+You do not need to download an EXE, Python, or any build tool.
+
+## Install
+
+Close World of Warcraft first.
+
+1. Extract the addon ZIP into `<WoW>\Interface\AddOns\`.
+2. Copy `patch-Z.MPQ` into `<WoW>\Data\`.
+3. Start the client and open settings with `/leftinteract gui`.
+
+The final paths should be:
+
+```text
+<WoW>\Interface\AddOns\LeftInteract\LeftInteract.toc
+<WoW>\Data\patch-Z.MPQ
+```
+
+Back up an existing `patch-Z.MPQ` before replacing it.
 
 ## Features
 
@@ -13,61 +37,6 @@ This repository contains the Interface 11200 addon and a source-only builder for
 - Ground-target spells use native left-click placement.
 - Native left click returns while an inventory item is attached.
 - `/leftinteract recover` restores the recorded mouse bindings.
-
-## Why a FrameXML patch is required
-
-Microbot blocks protected movement calls from addon Lua. The addon therefore maps mouse buttons to two trusted actions defined in the client's effective `Interface\FrameXML\Bindings.xml`.
-
-The builder reads that file from your own client, adds only the two Left Interact actions, creates `patch-Z.MPQ`, and reads the result back before accepting it. It rejects unknown source files and unsupported `mpqcli` versions.
-
-## Requirements
-
-- Microbot WoW 1.12.1 with the supported `Data\patch.MPQ`.
-- Python 3.11 or later.
-- [`mpqcli` 0.10.2](https://github.com/TheGrayDot/mpqcli/releases), exact build `0.10.2-4bd21908966bafbafc55c6dd293c68488684d212`.
-
-## Build the patch
-
-Install the pinned Python dependency:
-
-```bash
-python -m pip install --require-hashes -r requirements-patch.txt
-```
-
-Run the builder while WoW is closed:
-
-```bash
-python scripts/build_framexml_patch.py \
-  --client-data "C:/Games/Microbot/Data" \
-  --mpqcli "C:/Tools/mpqcli.exe" \
-  --output "dist/patch-Z.MPQ"
-```
-
-Verified hashes:
-
-```text
-Stock Bindings.xml:   c440a1b703676858df3c037b852d40fff0305b1bcf059a23600e93f6df327be2
-Patched Bindings.xml: b5b7e3a5ad6ac12d3ef914557f2cc5eb4ca63a0d18d56d064912656debce4b9f
-Built patch-Z.MPQ:    b6b132871d9107499dbf3f61f2754fd185be710f70798b9b4e47f08d62f224cb
-```
-
-## Install
-
-Build the addon ZIP:
-
-```bash
-python -m pip install --require-hashes -r requirements-dev.txt
-python scripts/validate.py
-python scripts/build_release.py
-```
-
-With WoW closed:
-
-1. Extract `LeftInteract` into `<WoW>\Interface\AddOns\`.
-2. Copy the generated `patch-Z.MPQ` into `<WoW>\Data\`.
-3. Start the client and open settings with `/leftinteract gui`.
-
-Back up an existing `patch-Z.MPQ` before replacing it. To roll back, close WoW, restore the prior MPQ, and restore or remove the addon folder.
 
 ## Commands
 
@@ -84,8 +53,28 @@ Back up an existing `patch-Z.MPQ` before replacing it. To roll back, close WoW, 
 
 The addon uses session-only `SetBinding` changes and never calls `SaveBindings`.
 
-## Scope
+## Verified files
 
-This project targets Microbot WoW 1.12.1 and Interface 11200. The patch builder adds no GlueXML, login, account, or realm-selection code. Other Vanilla clients may ship a different `Bindings.xml`; the builder will reject them rather than guess.
+```text
+LeftInteractVanilla-v0.2.1.zip
+76060aaf7d800c3ea6e898b7417c3a1b6b4f57d511e42610e87479086f61bf86
 
-The addon and builder are licensed under MIT. World of Warcraft and Blizzard FrameXML are owned by Blizzard Entertainment; no Blizzard files are distributed here.
+patch-Z.MPQ
+b6b132871d9107499dbf3f61f2754fd185be710f70798b9b4e47f08d62f224cb
+```
+
+The patch contains one file:
+
+```text
+Interface\FrameXML\Bindings.xml
+```
+
+It contains no executable, login code, account data, GlueXML, or realm-selection changes.
+
+## Open source
+
+The addon, tests, validator, release packager, and patch-builder source are in this repository under the MIT license. The patch builder exists for audit and maintenance; release users do not need it.
+
+This repository does **not** contain a game executable, account data, logs, or private client state. The released MPQ contains the one client-compatible binding override required by Left Interact.
+
+This project targets Microbot WoW 1.12.1 and Interface 11200. World of Warcraft and Blizzard FrameXML are owned by Blizzard Entertainment.
