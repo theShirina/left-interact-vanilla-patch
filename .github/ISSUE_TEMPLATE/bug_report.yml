@@ -1,0 +1,66 @@
+name: Bug report
+description: Report an input or Microbot 1.12 compatibility problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include account names, credentials, client files, MPQs, or private paths.
+
+  - type: input
+    id: client
+    attributes:
+      label: Client build
+      description: Exact Microbot or compatible Vanilla 1.12.1 build.
+      placeholder: "Microbot WoW 1.12.1"
+    validations:
+      required: true
+
+  - type: input
+    id: patch_hash
+    attributes:
+      label: Generated patch-Z.MPQ SHA-256
+      description: Hash printed by the repository patch builder.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: movement
+    attributes:
+      label: Movement mode
+      options:
+        - Combined (W-compatible)
+        - Independent (MOVEFORWARD)
+        - Right-click movement disabled
+    validations:
+      required: true
+
+  - type: textarea
+    id: sequence
+    attributes:
+      label: Exact input sequence
+      description: List buttons or keys pressed, held, and released in order.
+      placeholder: |
+        1. Hold left click
+        2. Hold right click
+        3. Release right click
+    validations:
+      required: true
+
+  - type: textarea
+    id: errors
+    attributes:
+      label: Lua error or chat warning
+      description: Remove account data and personal paths.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I restarted the client after installing the addon and patch.
+          required: true
+        - label: I removed account names, credentials, client files, and private paths.
+          required: true

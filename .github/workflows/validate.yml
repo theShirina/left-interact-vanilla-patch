@@ -1,0 +1,66 @@
+name: Vanilla and patch validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install pinned validators and patch reader
+        run: |
+          python -m pip install --disable-pip-version-check --require-hashes -r requirements-dev.txt
+          python -m pip install --disable-pip-version-check --require-hashes -r requirements-patch.txt
+
+      - name: Build checksum-pinned Lua 5.0.3
+        run: |
+          curl --fail --location --retry 3 --output lua-5.0.3.tar.gz https://www.lua.org/ftp/lua-5.0.3.tar.gz
+          echo "1193a61b0e08acaa6eee0eecf29709179ee49c71baebc59b682a25c3b5a45671  lua-5.0.3.tar.gz" | sha256sum --check
+          tar --extract --gzip --file lua-5.0.3.tar.gz
+          make --directory lua-5.0.3
+
+      - name: Validate public source boundary
+        run: python scripts/validate.py
+
+      - name: Compile addon with Lua 5.0.3
+        run: lua-5.0.3/bin/luac -p LeftInteract.lua
+
+      - name: Check patch builder CLI
+        run: python scripts/build_framexml_patch.py --help
+
+      - name: Test Vanilla binding lifecycle
+        run: |
+          for scenario in startup-reapply startup-migration-100 future-settings-version fresh-session reload-existing disable-restore external-change-preserved recover-originals logout-restore item-native-dispatch independent-movement changelog-page empty-click-hooks; do
+            lua-5.0.3/bin/lua tests/test_vanilla_bindings.lua "$scenario"
+          done
+
+      - name: Build addon package twice
+        run: |
+          python scripts/build_release.py --output-dir dist-a
+          python scripts/build_release.py --output-dir dist-b
+          cmp dist-a/LeftInteractVanilla-v*.zip dist-b/LeftInteractVanilla-v*.zip
+          cmp dist-a/LeftInteractVanilla-v*.zip.sha256 dist-b/LeftInteractVanilla-v*.zip.sha256
+
+      - name: Test release archive
+        run: unzip -t dist-a/LeftInteractVanilla-v*.zip
+
+      - name: Upload validated addon package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: LeftInteractVanilla
+          path: |
+            dist-a/*.zip
+            dist-a/*.sha256

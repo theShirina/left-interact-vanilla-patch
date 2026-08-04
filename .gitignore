@@ -1,0 +1,16 @@
+dist/
+dist-*/
+__pycache__/
+*.py[cod]
+*.MPQ
+*.mpq
+patch-Z.MPQ
+WTF/
+Cache/
+Logs/
+Errors/
+Screenshots/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,8 @@
+## Interface: 11200
+## Title: Left Interact Vanilla
+## Notes: Reversible left-click interaction for Microbot 1.12.1.
+## Author: Stefán (theShirina)
+## Version: 0.2.1
+## SavedVariables: LeftInteractDB
+
+LeftInteract.lua
