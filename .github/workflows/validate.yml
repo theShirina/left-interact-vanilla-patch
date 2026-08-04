@@ -25,15 +25,15 @@ jobs:
           python -m pip install --disable-pip-version-check --require-hashes -r requirements-dev.txt
           python -m pip install --disable-pip-version-check --require-hashes -r requirements-patch.txt
 
+      - name: Validate public source boundary
+        run: python scripts/validate.py
+
       - name: Build checksum-pinned Lua 5.0.3
         run: |
           curl --fail --location --retry 3 --output lua-5.0.3.tar.gz https://www.lua.org/ftp/lua-5.0.3.tar.gz
           echo "1193a61b0e08acaa6eee0eecf29709179ee49c71baebc59b682a25c3b5a45671  lua-5.0.3.tar.gz" | sha256sum --check
           tar --extract --gzip --file lua-5.0.3.tar.gz
           make --directory lua-5.0.3
-
-      - name: Validate public source boundary
-        run: python scripts/validate.py
 
       - name: Compile addon with Lua 5.0.3
         run: lua-5.0.3/bin/luac -p LeftInteract.lua
