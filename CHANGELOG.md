@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## [0.3.0] - 2026-08-08
 
+- Add a setting and `/leftinteract attack on|off` for hostile-creature attack triggering.
+- When disabled, left click selects living hostile creatures without starting an attack.
+- Keep corpses, hostile players, gathering nodes, and other objects on the normal interaction path.
 - Enable short empty-world click deselection by default and migrate v0.2.1 settings once.
+- Keep the settings panel compact and remove visible recovery controls; `/leftinteract recover` remains available.
 
 ## [0.2.1] - 2026-08-04
 

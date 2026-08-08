@@ -120,8 +120,9 @@ def main() -> int:
     interface = toc_value(toc, "Interface")
     version = toc_value(toc, "Version")
     require(interface == "11200", f"Expected Interface 11200, got {interface}")
-    require(version == "0.2.1", f"Expected version 0.2.1, got {version}")
+    require(version == "0.3.0", f"Expected version 0.3.0, got {version}")
     require("Private" not in toc, "TOC still marks the addon private")
+
     require(package_readme.startswith(f"LEFT INTERACT VANILLA {version}\n"), "README.txt version differs from TOC")
     require(f'local ADDON_VERSION = "{version}"' in lua, "GUI source version differs from TOC")
 
@@ -144,14 +145,22 @@ def main() -> int:
         'controller:RegisterEvent("PLAYER_LOGIN")',
         'SetTrackedBinding("BUTTON1", leftAction)',
         'SetTrackedBinding("BUTTON2", movementAction)',
-        'local leftAction = "LEFTINTERACT_ACTION"',
+        'local leftAction = LeftInteractDB.attackHostileNPC and "LEFTINTERACT_ACTION" or "LEFTINTERACT_NO_ATTACK"',
         'LeftInteractDB.movementMode == "combined" and "LEFTINTERACT_COMBINED" or "MOVEFORWARD"',
         'SetTrackedBinding("SHIFT-BUTTON1", "CAMERAORSELECTORMOVE")',
         'SetTrackedBinding("SHIFT-BUTTON2", "TURNORACTION")',
+        "LeftInteractDB.attackHostileNPC",
+        'command == "attack"',
         'command == "recover"',
     )
     for token in required_addon_tokens:
         require(token in lua, f"Required Vanilla behavior missing: {token}")
+
+    for token in (
+        "autoLootDefault", "autoLootLeftClick", "LeftInteract_NotifyAction",
+        "LOOT_OPENED", "LOOT_CLOSED", "LootSlot",
+    ):
+        require(token not in lua, f"Removed auto-loot path returned: {token}")
 
     require(not re.search(r"\bSaveBindings\s*\(", lua), "Addon must never call SaveBindings")
     for protected_call in (
@@ -165,13 +174,17 @@ def main() -> int:
     required_patch_tokens = (
         'SOURCE_MEMBER = r"Interface\\FrameXML\\Bindings.xml"',
         'SOURCE_SHA256 = "c440a1b703676858df3c037b852d40fff0305b1bcf059a23600e93f6df327be2"',
-        'PATCHED_SHA256 = "b5b7e3a5ad6ac12d3ef914557f2cc5eb4ca63a0d18d56d064912656debce4b9f"',
-        'MPQ_SHA256 = "b6b132871d9107499dbf3f61f2754fd185be710f70798b9b4e47f08d62f224cb"',
+        'PATCHED_SHA256 = "8129e84ea2451016b1a032f2d07b3b2ac6192c83ea1d9696301d64b3d80ab3d1"',
+        'MPQ_SHA256 = "20152cb4bfdaecf5dcb5784e64b17fd1865de01d2e16ee9b7deaa4ce6cbd8145"',
         'MPQCLI_VERSION = "0.10.2-4bd21908966bafbafc55c6dd293c68488684d212"',
         "FIXED_MTIME = 315532800",
         '<Binding name="LEFTINTERACT_ACTION" runOnUp="true" hidden="true">',
+        '<Binding name="LEFTINTERACT_NO_ATTACK" runOnUp="true" hidden="true">',
         '<Binding name="LEFTINTERACT_COMBINED" runOnUp="true" hidden="true">',
         "SpellIsTargeting()",
+        'UnitCanAttack("player", "mouseover")',
+        'not UnitIsPlayer("mouseover")',
+        'not UnitIsDead("mouseover")',
         "verify_archive(destination_temp, payload)",
         "os.replace(destination_temp, args.output)",
         "subprocess.CREATE_NO_WINDOW",
@@ -179,6 +192,8 @@ def main() -> int:
     )
     for token in required_patch_tokens:
         require(token in patch_builder, f"Patch builder guard missing: {token}")
+    require("LeftInteractDB" not in patch_builder, "Trusted FrameXML must not read addon-owned saved variables")
+    require("LeftInteractFrameXML_LootClickTime" not in patch_builder, "Trusted FrameXML must not bridge auto-loot state into addon Lua")
     for token in FORBIDDEN_PATCH_TOKENS:
         require(token not in patch_builder, f"Unrelated Glue/login/realm code in patch builder: {token}")
 
@@ -191,14 +206,15 @@ def main() -> int:
     require('text.replace("\\r\\n", "\\n").replace("\\r", "\\n")' in addon_builder, "ZIP builder does not canonicalize LF")
 
     require("No client files or MPQs are included" in package_readme, "Package README lacks client-file boundary")
-    require("releases/latest/download/LeftInteractVanilla-v0.2.1.zip" in readme, "Direct addon download missing")
+    require(f"releases/latest/download/LeftInteractVanilla-v{version}.zip" in readme, "Direct addon download missing")
     require("releases/latest/download/patch-Z.MPQ" in readme, "Direct patch download missing")
     require("You do not need to download an EXE, Python, or any build tool" in readme, "Simple no-EXE install promise missing")
     require("does **not** contain a game executable" in readme, "Public README lacks source boundary")
     require("no executable, login code, account data, GlueXML, or realm-selection changes" in readme, "README lacks patch boundary")
     require("never calls `SaveBindings`" in readme, "README lacks binding safety statement")
     require("/leftinteract recover" in readme and "/leftinteract recover" in package_readme, "Recovery command missing")
-    require(re.search(r"^## \[0\.2\.1\] - 2026-08-04$", changelog, re.MULTILINE) is not None, "Current changelog entry missing")
+    require(re.search(rf"^## \[{re.escape(version)}\] - 2026-08-08$", changelog, re.MULTILINE) is not None, "Current changelog entry missing")
+    require("tests/test_framexml_attack_dispatch.py --lua lua-5.0.3/bin/lua" in workflow, "CI does not execute hostile-NPC FrameXML dispatch tests")
 
     action_refs = re.findall(r"uses:\s*[^@\s]+@([0-9a-f]{40})", workflow)
     require(len(action_refs) == 3, f"Expected three SHA-pinned workflow actions, got {len(action_refs)}")

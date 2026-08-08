@@ -66,7 +66,7 @@ elseif scenario == "future-settings-version" then
         enabled = true,
         rightMove = true,
         movementMode = "combined",
-        settingsVersion = 102,
+        settingsVersion = 999,
         originalsCaptured = true,
         originalBindings = savedOriginals,
         appliedBindings = {},
@@ -85,6 +85,8 @@ local namedFrames = {}
 local widgetMethods = {}
 
 function widgetMethods:SetText(text) rawset(self, "text", text) end
+function widgetMethods:SetWidth(width) rawset(self, "width", width) end
+function widgetMethods:SetHeight(height) rawset(self, "height", height) end
 function widgetMethods:SetScript(name, handler)
     local scripts = rawget(self, "scripts")
     if not scripts then scripts = {}; rawset(self, "scripts", scripts) end
@@ -157,6 +159,7 @@ function SaveBindings()
 end
 function LoadBindings() error("Left Interact Vanilla must not replace the current binding set") end
 function CursorHasItem() return cursorItem end
+
 function GetCursorPosition() return 0, 0 end
 function GetTime() return 0 end
 function UnitExists(unit)
@@ -218,16 +221,52 @@ if scenario == "fresh-session" then
     assert(bindingActions.BUTTON2 == "LEFTINTERACT_COMBINED", "fresh install must use the trusted W-compatible combined action")
     assert(bindingActions["SHIFT-BUTTON2"] == "TURNORACTION", "native right-click fallback missing")
 elseif scenario == "startup-migration-100" then
-    assert(LeftInteractDB.settingsVersion == 102, "v100 settings were not migrated")
+    assert(LeftInteractDB.settingsVersion == 103, "v100 settings were not migrated")
     assert(LeftInteractDB.originalBindings.BUTTON1 == nativeBindings.BUTTON1, "migration did not replace stale BUTTON1")
     assert(LeftInteractDB.originalBindings.BUTTON2 == nativeBindings.BUTTON2, "migration did not replace stale BUTTON2")
 elseif scenario == "future-settings-version" then
-    assert(LeftInteractDB.settingsVersion == 102, "future settings version was downgraded")
+    assert(LeftInteractDB.settingsVersion == 999, "future settings version was downgraded")
 elseif scenario == "reload-existing" then
     assert(LeftInteractDB.originalBindings.BUTTON1 == nativeBindings.BUTTON1, "reload overwrote saved original BUTTON1")
     assert(LeftInteractDB.originalBindings.BUTTON2 == nativeBindings.BUTTON2, "reload overwrote saved original BUTTON2")
 elseif scenario == "independent-movement" then
     assert(bindingActions.BUTTON2 == "MOVEFORWARD", "independent movement must use MOVEFORWARD")
+elseif scenario == "settings-layout-cleanup" then
+    local options = namedFrames.LeftInteractOptionsFrame
+    assert(options and options.width == 480 and options.height == 450, "settings panel does not use the compact 480x450 layout")
+    local labels = {}
+    for _, frame in ipairs(createdFrames) do
+        if rawget(frame, "text") then labels[frame.text] = true end
+    end
+    assert(labels["Microbot 1.12.1 accessibility controls"], "settings subtitle is not concise")
+    assert(labels["W-compatible (recommended)"], "recommended movement choice is unclear")
+    assert(labels["Start attacks on hostile creatures"], "hostile-creature toggle is not plain or clear")
+    assert(labels["Off: select living hostile creatures without attacking."], "no-attack behavior is not explained")
+    assert(not labels["Left-click auto-loot"], "failed auto-loot control remains in settings")
+    assert(not rawget(options, "autoLootCheck"), "failed auto-loot checkbox remains attached to settings")
+    assert(not labels["BINDING SAFETY"], "binding-safety card remains")
+    assert(not labels["RESTORE BINDINGS"], "restore button remains in the settings panel")
+    assert(not labels["Emergency: /leftinteract recover"], "emergency recovery text remains in the settings panel")
+    assert(not labels["Private Microbot 1.12.1 accessibility port"], "stale private-port wording remains")
+elseif scenario == "attack-setting-default" then
+    assert(LeftInteractDB.attackHostileNPC == true, "hostile-NPC attack trigger must preserve the current behavior by default")
+elseif scenario == "attack-setting-toggle" then
+    SlashCmdList.LEFTINTERACT("attack off")
+    assert(LeftInteractDB.attackHostileNPC == false, "attack off did not disable hostile-NPC attack triggering")
+    assert(bindingActions.BUTTON1 == "LEFTINTERACT_NO_ATTACK", "attack off did not select the taint-free no-attack binding")
+    SlashCmdList.LEFTINTERACT("attack on")
+    assert(LeftInteractDB.attackHostileNPC == true, "attack on did not restore hostile-NPC attack triggering")
+    assert(bindingActions.BUTTON1 == "LEFTINTERACT_ACTION", "attack on did not restore the standard interaction binding")
+elseif scenario == "attack-setting-checkbox" then
+    local options = namedFrames.LeftInteractOptionsFrame
+    local attackCheck = options and rawget(options, "attackCheck")
+    assert(attackCheck, "hostile-NPC attack checkbox is missing")
+    attackCheck.GetChecked = function() return false end
+    this = attackCheck
+    attackCheck.scripts.OnClick()
+    this = nil
+    assert(LeftInteractDB.attackHostileNPC == false, "attack checkbox did not disable hostile-NPC attack triggering")
+    assert(bindingActions.BUTTON1 == "LEFTINTERACT_NO_ATTACK", "attack checkbox did not select the taint-free no-attack binding")
 elseif scenario == "disable-restore" then
     SlashCmdList.LEFTINTERACT("off")
     AssertOriginalsRestored("disable")
@@ -262,7 +301,7 @@ elseif scenario == "changelog-page" then
         local scripts = rawget(frame, "scripts")
         if frame.text == "WHAT'S NEW" and scripts and scripts.OnClick then
             whatsNew = frame
-        elseif frame.text == "v0.2.1" then
+        elseif frame.text == "v0.3.0" then
             correctVersion = true
         end
     end
@@ -288,7 +327,7 @@ elseif scenario == "empty-click-hooks" then
     this, arg1 = nil, nil
     assert(originalMouseDownCalled, "existing WorldFrame OnMouseDown handler was not chained")
 elseif scenario == "empty-click-migration-101" then
-    assert(LeftInteractDB.settingsVersion == 102, "v101 settings were not migrated")
+    assert(LeftInteractDB.settingsVersion == 103, "v101 settings were not migrated")
     assert(LeftInteractDB.emptyClickDeselect == true, "native-like empty-click deselection was not enabled")
     this = WorldFrame
     arg1 = "LeftButton"

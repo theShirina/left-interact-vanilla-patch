@@ -1,4 +1,4 @@
-LEFT INTERACT VANILLA 0.2.1
+LEFT INTERACT VANILLA 0.3.0
 ===========================
 
 DOWNLOAD
@@ -6,7 +6,7 @@ DOWNLOAD
 Get these two files from:
 https://github.com/theShirina/left-interact-vanilla-patch/releases/latest
 
-1. LeftInteractVanilla-v0.2.1.zip
+1. LeftInteractVanilla-v0.3.0.zip
 2. patch-Z.MPQ
 
 No EXE, Python, or build tool is required.
@@ -35,6 +35,8 @@ FEATURES
 - Held-left steering resumes after right click is released.
 - Ground-target spells use native left-click placement.
 - Native left click returns while an inventory item is attached.
+- Choose whether left click attacks living hostile creatures or only selects them.
+- The hostile-creature option switches between separate trusted click actions.
 
 BINDING SAFETY
 --------------
@@ -54,6 +56,7 @@ COMMANDS
 /leftinteract recover
 /leftinteract rightmove on|off
 /leftinteract movement combined|independent
+/leftinteract attack on|off
 
 The separate patch-Z.MPQ contains only:
 Interface\FrameXML\Bindings.xml

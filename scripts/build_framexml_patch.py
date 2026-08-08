@@ -15,8 +15,8 @@ import mpyq
 
 SOURCE_MEMBER = r"Interface\FrameXML\Bindings.xml"
 SOURCE_SHA256 = "c440a1b703676858df3c037b852d40fff0305b1bcf059a23600e93f6df327be2"
-PATCHED_SHA256 = "b5b7e3a5ad6ac12d3ef914557f2cc5eb4ca63a0d18d56d064912656debce4b9f"
-MPQ_SHA256 = "b6b132871d9107499dbf3f61f2754fd185be710f70798b9b4e47f08d62f224cb"
+PATCHED_SHA256 = "8129e84ea2451016b1a032f2d07b3b2ac6192c83ea1d9696301d64b3d80ab3d1"
+MPQ_SHA256 = "20152cb4bfdaecf5dcb5784e64b17fd1865de01d2e16ee9b7deaa4ce6cbd8145"
 MPQCLI_VERSION = "0.10.2-4bd21908966bafbafc55c6dd293c68488684d212"
 FIXED_MTIME = 315532800  # 1980-01-01 00:00:00 UTC
 
@@ -25,6 +25,31 @@ INSERTION = '''
 \t<Binding name="LEFTINTERACT_ACTION" runOnUp="true" hidden="true">
 \t\tif ( keystate == "down" ) then
 \t\t\tif ( SpellIsTargeting() ) then
+\t\t\t\tLeftInteractFrameXML_LeftNative = true;
+\t\t\t\tLeftInteractFrameXML_LeftHeld = nil;
+\t\t\t\tCameraOrSelectOrMoveStart();
+\t\t\telse
+\t\t\t\tLeftInteractFrameXML_LeftNative = nil;
+\t\t\t\tLeftInteractFrameXML_LeftHeld = true;
+\t\t\t\tTurnOrActionStart();
+\t\t\tend
+\t\telse
+\t\t\tif ( LeftInteractFrameXML_LeftNative ) then
+\t\t\t\tLeftInteractFrameXML_LeftNative = nil;
+\t\t\t\tif ( not LeftInteractFrameXML_RightHeld ) then
+\t\t\t\t\tCameraOrSelectOrMoveStop();
+\t\t\t\tend
+\t\t\telse
+\t\t\t\tLeftInteractFrameXML_LeftHeld = nil;
+\t\t\t\tif ( not LeftInteractFrameXML_RightHeld ) then
+\t\t\t\t\tTurnOrActionStop();
+\t\t\t\tend
+\t\t\tend
+\t\tend
+\t</Binding>
+\t<Binding name="LEFTINTERACT_NO_ATTACK" runOnUp="true" hidden="true">
+\t\tif ( keystate == "down" ) then
+\t\t\tif ( SpellIsTargeting() or ( UnitExists("mouseover") and UnitCanAttack("player", "mouseover") and not UnitIsPlayer("mouseover") and not UnitIsDead("mouseover") ) ) then
 \t\t\t\tLeftInteractFrameXML_LeftNative = true;
 \t\t\t\tLeftInteractFrameXML_LeftHeld = nil;
 \t\t\t\tCameraOrSelectOrMoveStart();
@@ -78,7 +103,7 @@ def patched_bindings(source: bytes) -> bytes:
         )
 
     text = source.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
-    if "LEFTINTERACT_ACTION" in text or "LEFTINTERACT_COMBINED" in text:
+    if "LEFTINTERACT_ACTION" in text or "LEFTINTERACT_NO_ATTACK" in text or "LEFTINTERACT_COMBINED" in text:
         raise RuntimeError("Source already contains Left Interact bindings")
     if text.count("</Bindings>") != 1:
         raise RuntimeError("Expected one closing </Bindings> tag")

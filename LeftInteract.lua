@@ -1,5 +1,5 @@
 local ADDON_NAME = "LeftInteract"
-local ADDON_VERSION = "0.2.1"
+local ADDON_VERSION = "0.3.0"
 
 LeftInteractDB = LeftInteractDB or {}
 
@@ -78,7 +78,8 @@ end
 
 local function ConfigSummary()
     local movement = LeftInteractDB.rightMove and MovementName() or "native right click"
-    return "world interaction, " .. movement
+    local attack = LeftInteractDB.attackHostileNPC and "hostile attacks enabled" or "hostile selection only"
+    return attack .. ", " .. movement
 end
 
 local function RefreshOptions()
@@ -104,7 +105,7 @@ local function ApplyBindings(silent)
     end
 
     cursorHasItem = CursorHasItem and CursorHasItem() and true or false
-    local leftAction = "LEFTINTERACT_ACTION"
+    local leftAction = LeftInteractDB.attackHostileNPC and "LEFTINTERACT_ACTION" or "LEFTINTERACT_NO_ATTACK"
     if cursorHasItem then
         leftAction = LeftInteractDB.originalBindings.BUTTON1
     end
@@ -222,10 +223,22 @@ SlashCmdList.LEFTINTERACT = function(message)
         LeftInteractDB.rightMove = true
         if LeftInteractDB.enabled then ApplyBindings(true) end
         Print("Movement mode: " .. MovementName() .. ".")
+    elseif command == "attack" then
+        if argument == "on" then
+            LeftInteractDB.attackHostileNPC = true
+        elseif argument == "off" then
+            LeftInteractDB.attackHostileNPC = false
+        else
+            Print("Usage: /leftinteract attack on|off")
+            return
+        end
+        if LeftInteractDB.enabled then ApplyBindings(true) end
+        Print("Hostile-creature attack trigger " .. (LeftInteractDB.attackHostileNPC and "enabled." or "disabled."))
+        RefreshOptions()
     elseif command == "gui" or command == "config" or command == "options" or command == "" then
         if ToggleGUI then ToggleGUI() end
     else
-        Print("Commands: gui, on, off, toggle, status, recover, rightmove on/off, movement combined/independent")
+        Print("Commands: gui, on, off, toggle, status, recover, rightmove on/off, movement combined/independent, attack on/off")
     end
 end
 
@@ -290,9 +303,15 @@ local function MakeLabel(parent, text, size)
 end
 
 local CHANGELOG_TEXT = [[
-UNRELEASED
+v0.3.0 - 2026-08-08
+ADDED
+- Add a setting and /leftinteract attack on|off for hostile-creature attack triggering.
+
 CHANGED
+- When attack triggering is off, left click selects living hostile creatures without attacking them.
+- Keep corpses, hostile players, gathering nodes and other objects on the normal interaction path.
 - Enable short empty-world click deselection by default and migrate v0.2.1 settings once.
+- Keep settings compact and remove recovery controls from the visible panel; /leftinteract recover remains available.
 
 v0.2.1 - 2026-08-04
 ADDED
@@ -360,7 +379,7 @@ local function CreateOptionsGUI()
     if optionsFrame then return end
 
     local frame = CreateFrame("Frame", "LeftInteractOptionsFrame", UIParent)
-    frame:SetWidth(480); frame:SetHeight(560)
+    frame:SetWidth(480); frame:SetHeight(450)
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
@@ -388,7 +407,7 @@ local function CreateOptionsGUI()
 
     local title = MakeLabel(frame, "Left Interact Vanilla", 20)
     title:SetPoint("TOPLEFT", frame, "TOPLEFT", 24, -20)
-    local subtitle = MakeLabel(frame, "Private Microbot 1.12.1 accessibility port", 12)
+    local subtitle = MakeLabel(frame, "Microbot 1.12.1 accessibility controls", 12)
     subtitle:SetTextColor(0.55, 0.8, 1)
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
     local version = MakeLabel(frame, "v" .. ADDON_VERSION, 11)
@@ -418,7 +437,7 @@ local function CreateOptionsGUI()
     movementCard:SetTexture("Interface\\Buttons\\WHITE8X8")
     movementCard:SetVertexColor(0.06, 0.075, 0.09, 0.88)
     movementCard:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, -112)
-    movementCard:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -18, -244)
+    movementCard:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -18, -236)
 
     local moveTitle = MakeLabel(frame, "MOVEMENT", 13)
     moveTitle:SetTextColor(0.3, 0.8, 1)
@@ -467,21 +486,36 @@ local function CreateOptionsGUI()
     local interactionCard = frame:CreateTexture(nil, "BACKGROUND")
     interactionCard:SetTexture("Interface\\Buttons\\WHITE8X8")
     interactionCard:SetVertexColor(0.06, 0.075, 0.09, 0.88)
-    interactionCard:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, -252)
-    interactionCard:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -18, -336)
+    interactionCard:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, -244)
+    interactionCard:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -18, -379)
 
     local interactTitle = MakeLabel(frame, "INTERACTION", 13)
     interactTitle:SetTextColor(0.3, 0.8, 1)
-    interactTitle:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -264)
-    local interactText = MakeLabel(frame, "Left click: NPCs, loot, gathering and world objects. Shift + left: native selection and camera.", 11)
+    interactTitle:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -256)
+    local interactText = MakeLabel(frame, "Left click interacts. Shift + left keeps Blizzard's native click.", 11)
     interactText:SetTextColor(0.85, 0.88, 0.9)
     interactText:SetWidth(410)
     interactText:SetJustifyH("LEFT")
     interactText:SetPoint("TOPLEFT", interactTitle, "BOTTOMLEFT", 0, -6)
 
+    local attack = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    attack:SetPoint("TOPLEFT", interactText, "BOTTOMLEFT", -4, -5)
+    local attackText = MakeLabel(frame, "Start attacks on hostile creatures", 11)
+    attackText:SetPoint("LEFT", attack, "RIGHT", 4, 1)
+    attack:SetScript("OnClick", function()
+        LeftInteractDB.attackHostileNPC = this:GetChecked() and true or false
+        if LeftInteractDB.enabled then ApplyBindings(true) end
+        frame:Refresh()
+    end)
+    frame.attackCheck = attack
+
+    local attackHelp = MakeLabel(frame, "Off: select living hostile creatures without attacking.", 10)
+    attackHelp:SetTextColor(0.65, 0.7, 0.74)
+    attackHelp:SetPoint("TOPLEFT", attack, "BOTTOMLEFT", 4, -1)
+
     local deselect = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
-    deselect:SetPoint("TOPLEFT", interactText, "BOTTOMLEFT", -4, -5)
-    local deselectText = MakeLabel(frame, "Short empty click clears target (experimental)", 11)
+    deselect:SetPoint("TOPLEFT", attackHelp, "BOTTOMLEFT", -4, -5)
+    local deselectText = MakeLabel(frame, "Empty click clears target", 11)
     deselectText:SetPoint("LEFT", deselect, "RIGHT", 4, 1)
     deselect:SetScript("OnClick", function()
         LeftInteractDB.emptyClickDeselect = this:GetChecked() and true or false
@@ -489,58 +523,27 @@ local function CreateOptionsGUI()
     end)
     frame.deselectCheck = deselect
 
-    local safetyCard = frame:CreateTexture(nil, "BACKGROUND")
-    safetyCard:SetTexture("Interface\\Buttons\\WHITE8X8")
-    safetyCard:SetVertexColor(0.11, 0.075, 0.035, 0.94)
-    safetyCard:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, -344)
-    safetyCard:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -18, -480)
-
-    local safetyTitle = MakeLabel(frame, "VANILLA BINDING SAFETY", 13)
-    safetyTitle:SetTextColor(1, 0.75, 0.2)
-    safetyTitle:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -356)
-    local safetyText = MakeLabel(frame, "Vanilla has no temporary override API. This build changes only the current session, never saves bindings, and restores your recorded mouse actions when disabled or at logout.", 11)
-    safetyText:SetTextColor(0.9, 0.9, 0.9)
-    safetyText:SetWidth(410)
-    safetyText:SetJustifyH("LEFT")
-    safetyText:SetPoint("TOPLEFT", safetyTitle, "BOTTOMLEFT", 0, -6)
-
-    local recover = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    recover:SetWidth(150); recover:SetHeight(28)
-    recover:SetPoint("TOPLEFT", safetyText, "BOTTOMLEFT", 0, -8)
-    recover:SetText("RESTORE ORIGINALS")
-    recover:SetScript("OnClick", function()
-        LeftInteractDB.enabled = false
-        RemoveBindings(false, true)
-        Print("Recovery complete. Original mouse bindings restored; addon left disabled.")
-        frame:Refresh()
-    end)
-    local recoveryHelp = MakeLabel(frame, "Emergency: /leftinteract recover", 11)
-    recoveryHelp:SetTextColor(0.7, 0.75, 0.78)
-    recoveryHelp:SetPoint("LEFT", recover, "RIGHT", 10, 0)
-
-    local hint = MakeLabel(frame, "Item drag: native. Shift + left: selection and camera.", 11)
-    hint:SetTextColor(0.7, 0.7, 0.7)
-    hint:SetPoint("BOTTOM", frame, "BOTTOM", 0, 49)
     local status = MakeLabel(frame, "", 11)
     status:SetWidth(440)
     status:SetJustifyH("CENTER")
-    status:SetPoint("BOTTOM", frame, "BOTTOM", 0, 20)
+    status:SetPoint("BOTTOM", frame, "BOTTOM", 0, 18)
     frame.statusText = status
 
     function frame:Refresh()
         self.enabledCheck:SetChecked(LeftInteractDB.enabled and true or false)
         self.rightMoveCheck:SetChecked(LeftInteractDB.rightMove and true or false)
+        self.attackCheck:SetChecked(LeftInteractDB.attackHostileNPC and true or false)
         self.deselectCheck:SetChecked(LeftInteractDB.emptyClickDeselect and true or false)
         local combinedSelected = LeftInteractDB.movementMode == "combined"
         local independentSelected = LeftInteractDB.movementMode == "independent"
-        self.combinedButton:SetText(combinedSelected and ">  W-compatible + seamless" or "W-compatible + seamless")
-        self.independentButton:SetText(independentSelected and ">  Legacy MOVEFORWARD" or "Legacy MOVEFORWARD")
+        self.combinedButton:SetText("W-compatible (recommended)")
+        self.independentButton:SetText("Legacy MOVEFORWARD")
         if combinedSelected then self.combinedButton:LockHighlight() else self.combinedButton:UnlockHighlight() end
         if independentSelected then self.independentButton:LockHighlight() else self.independentButton:UnlockHighlight() end
         if independentSelected then
-            self.movementHelp:SetText("Legacy fallback: right click can be re-pressed, but it shares movement state with W.")
+            self.movementHelp:SetText("Legacy mode shares movement state with W.")
         else
-            self.movementHelp:SetText("Default: W stays independent and held-left steering resumes after right release.")
+            self.movementHelp:SetText("W stays independent; left steering resumes after right-click.")
         end
         if active then
             self.statusText:SetText("Enabled - " .. ConfigSummary())
@@ -632,14 +635,15 @@ controller:SetScript("OnEvent", function()
         if LeftInteractDB.emptyClickDeselect == nil or savedSettingsVersion < 102 then
             LeftInteractDB.emptyClickDeselect = true
         end
+        if LeftInteractDB.attackHostileNPC == nil then LeftInteractDB.attackHostileNPC = true end
         if firstRun then
             LeftInteractDB.movementMode = "combined"
         elseif LeftInteractDB.movementMode ~= "independent" and LeftInteractDB.movementMode ~= "combined" then
             LeftInteractDB.movementMode = "combined"
         end
         recaptureBindingsOnLogin = savedSettingsVersion < 101
-        if savedSettingsVersion < 102 then
-            LeftInteractDB.settingsVersion = 102
+        if savedSettingsVersion < 103 then
+            LeftInteractDB.settingsVersion = 103
         end
 
         CreateOptionsGUI()

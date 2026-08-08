@@ -43,9 +43,10 @@ jobs:
 
       - name: Test Vanilla binding lifecycle
         run: |
-          for scenario in startup-reapply startup-migration-100 future-settings-version fresh-session reload-existing disable-restore external-change-preserved recover-originals logout-restore item-native-dispatch independent-movement changelog-page empty-click-hooks; do
+          for scenario in startup-reapply startup-migration-100 future-settings-version fresh-session reload-existing disable-restore external-change-preserved recover-originals logout-restore item-native-dispatch independent-movement changelog-page empty-click-hooks empty-click-migration-101 attack-setting-default attack-setting-toggle attack-setting-checkbox settings-layout-cleanup; do
             lua-5.0.3/bin/lua tests/test_vanilla_bindings.lua "$scenario"
           done
+          python tests/test_framexml_attack_dispatch.py --lua lua-5.0.3/bin/lua
 
       - name: Build addon package twice
         run: |

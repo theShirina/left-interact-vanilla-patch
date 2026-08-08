@@ -6,7 +6,7 @@ Left-click interaction and seamless mouse steering for the Microbot World of War
 
 Download these two files from the latest release:
 
-1. **[LeftInteractVanilla-v0.2.1.zip](https://github.com/theShirina/left-interact-vanilla-patch/releases/latest/download/LeftInteractVanilla-v0.2.1.zip)** — addon
+1. **[LeftInteractVanilla-v0.3.0.zip](https://github.com/theShirina/left-interact-vanilla-patch/releases/latest/download/LeftInteractVanilla-v0.3.0.zip)** — addon
 2. **[patch-Z.MPQ](https://github.com/theShirina/left-interact-vanilla-patch/releases/latest/download/patch-Z.MPQ)** — required FrameXML patch
 
 You do not need to download an EXE, Python, or any build tool.
@@ -37,6 +37,8 @@ Back up an existing `patch-Z.MPQ` before replacing it.
 - Ground-target spells use native left-click placement.
 - Native left click returns while an inventory item is attached.
 - Short empty-world clicks clear the current target by default.
+- Choose whether left click starts attacking living hostile creatures or only selects them.
+- The hostile-creature setting switches between separate trusted actions; FrameXML never reads addon settings.
 - `/leftinteract recover` restores the recorded mouse bindings.
 
 ## Commands
@@ -50,19 +52,10 @@ Back up an existing `patch-Z.MPQ` before replacing it.
 /leftinteract recover
 /leftinteract rightmove on|off
 /leftinteract movement combined|independent
+/leftinteract attack on|off
 ```
 
 The addon uses session-only `SetBinding` changes and never calls `SaveBindings`.
-
-## Verified files
-
-```text
-LeftInteractVanilla-v0.2.1.zip
-76060aaf7d800c3ea6e898b7417c3a1b6b4f57d511e42610e87479086f61bf86
-
-patch-Z.MPQ
-b6b132871d9107499dbf3f61f2754fd185be710f70798b9b4e47f08d62f224cb
-```
 
 The patch contains one file:
 
