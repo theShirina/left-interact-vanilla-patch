@@ -1,6 +1,6 @@
 # Left Interact Vanilla
 
-Left-click interaction and seamless mouse steering for the Microbot World of Warcraft 1.12.1 client.
+Left-click interaction and seamless mouse steering for the WoW 1.12 client.
 
 ## Downloads
 
@@ -71,4 +71,4 @@ The addon, tests, validator, release packager, and patch-builder source are in t
 
 This repository does **not** contain a game executable, account data, logs, or private client state. The released MPQ contains the one client-compatible binding override required by Left Interact.
 
-This project targets Microbot WoW 1.12.1 and Interface 11200. World of Warcraft and Blizzard FrameXML are owned by Blizzard Entertainment.
+This project targets WoW 1.12 and Interface 11200. World of Warcraft and Blizzard FrameXML are owned by Blizzard Entertainment.

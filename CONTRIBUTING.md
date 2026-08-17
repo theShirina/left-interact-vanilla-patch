@@ -1,6 +1,6 @@
 # Contributing
 
-Keep changes small and compatible with Microbot WoW 1.12.1, Interface 11200, and Lua 5.0.
+Keep changes small and compatible with WoW 1.12, Interface 11200, and Lua 5.0.
 
 ## Before opening a pull request
 

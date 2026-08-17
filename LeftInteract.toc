@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Title: Left Interact Vanilla
-## Notes: Reversible left-click interaction for Microbot 1.12.1.
+## Notes: Reversible left-click interaction for WoW 1.12.
 ## Author: Stefán (theShirina)
 ## Version: 0.3.0
 ## SavedVariables: LeftInteractDB

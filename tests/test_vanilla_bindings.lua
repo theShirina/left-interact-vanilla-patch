@@ -238,7 +238,7 @@ elseif scenario == "settings-layout-cleanup" then
     for _, frame in ipairs(createdFrames) do
         if rawget(frame, "text") then labels[frame.text] = true end
     end
-    assert(labels["Microbot 1.12.1 accessibility controls"], "settings subtitle is not concise")
+    assert(labels["WoW 1.12 accessibility controls"], "settings subtitle is not concise")
     assert(labels["W-compatible (recommended)"], "recommended movement choice is unclear")
     assert(labels["Start attacks on hostile creatures"], "hostile-creature toggle is not plain or clear")
     assert(labels["Off: select living hostile creatures without attacking."], "no-attack behavior is not explained")
@@ -247,7 +247,7 @@ elseif scenario == "settings-layout-cleanup" then
     assert(not labels["BINDING SAFETY"], "binding-safety card remains")
     assert(not labels["RESTORE BINDINGS"], "restore button remains in the settings panel")
     assert(not labels["Emergency: /leftinteract recover"], "emergency recovery text remains in the settings panel")
-    assert(not labels["Private Microbot 1.12.1 accessibility port"], "stale private-port wording remains")
+    assert(not labels["Private WoW 1.12 accessibility port"], "stale private-port wording remains")
 elseif scenario == "attack-setting-default" then
     assert(LeftInteractDB.attackHostileNPC == true, "hostile-NPC attack trigger must preserve the current behavior by default")
 elseif scenario == "attack-setting-toggle" then

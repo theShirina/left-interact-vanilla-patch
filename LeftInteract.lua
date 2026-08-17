@@ -322,13 +322,13 @@ ADDED
 
 v0.1.0 - 2026-08-04
 ADDED
-- Fork the addon into a private Vanilla 1.12.1 port for Microbot.
+- Fork the addon into a private Vanilla 1.12.1 port for WoW.
 - Target Interface 11200 and Vanilla frame callback semantics.
 - Replace 3.3.5 override bindings with reversible session-only SetBinding changes.
 - Never call SaveBindings and restore recorded mouse actions on disable or logout.
 - Preserve newer mouse-binding changes made by another addon during normal disable or logout.
 - Preserve original bindings across /reload and add /leftinteract recover.
-- Support Microbot's patched MOVEANDSTEER and stock MOVEFORWARD movement modes.
+- Support WoW's patched MOVEANDSTEER and stock MOVEFORWARD movement modes.
 - Restore native BUTTON1 while an inventory item is attached to the cursor.
 - Replace the unavailable script-hook method with chained GetScript and SetScript handlers.
 - Keep the settings and What's New pages while removing server-specific guidance.
@@ -407,7 +407,7 @@ local function CreateOptionsGUI()
 
     local title = MakeLabel(frame, "Left Interact Vanilla", 20)
     title:SetPoint("TOPLEFT", frame, "TOPLEFT", 24, -20)
-    local subtitle = MakeLabel(frame, "Microbot 1.12.1 accessibility controls", 12)
+    local subtitle = MakeLabel(frame, "WoW 1.12 accessibility controls", 12)
     subtitle:SetTextColor(0.55, 0.8, 1)
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
     local version = MakeLabel(frame, "v" .. ADDON_VERSION, 11)

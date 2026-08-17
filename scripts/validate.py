@@ -44,7 +44,7 @@ FORBIDDEN_SUFFIXES = {
 FORBIDDEN_PATCH_TOKENS = (
     "GlueParent",
     "RealmList",
-    "Microbot Vanilla",
+    "WoW Vanilla",
     "OPEN_STATUS_DIALOG",
     "RESPONSE_SUCCESS",
     "SetPreferredInfo",

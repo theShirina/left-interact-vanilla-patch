@@ -156,7 +156,7 @@ def verify_archive(path: Path, payload: bytes) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build Left Interact patch-Z.MPQ from a supported local Microbot 1.12.1 client."
+        description="Build Left Interact patch-Z.MPQ from a supported local WoW 1.12 client."
     )
     parser.add_argument("--client-data", required=True, type=Path, help="Path to the client's Data folder")
     parser.add_argument("--mpqcli", required=True, type=Path, help="Path to mpqcli 0.10.2")
