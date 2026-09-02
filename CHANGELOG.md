@@ -2,27 +2,38 @@
 
 ## 0.3.0 — 2026-08-08
 
-- Add a setting and `/leftinteract attack on|off` for hostile-creature attack triggering.
-- When disabled, left click selects living hostile creatures without starting an attack.
-- Keep corpses, hostile players, gathering nodes, and other objects on the normal interaction path.
-- Enable short empty-world click deselection by default and migrate v0.2.1 settings once.
-- Keep the settings panel compact and remove visible recovery controls; `/leftinteract recover` remains available.
+### Added
+
+- Choose whether left click starts an attack on living hostile creatures or only selects them.
+- Use `/leftinteract attack on|off` to change that setting.
+
+### Changed
+
+- Short empty-world clicks clear the current target by default, with one-time migration for existing 0.2.1 settings.
+- Corpses, hostile players, gathering nodes, and world objects keep their normal interaction behavior.
+- The settings panel is more compact; `/leftinteract recover` remains available.
 
 ## 0.2.1 — 2026-08-04
 
-- Use trusted FrameXML actions for seamless held-left steering and W-compatible right-click movement.
-- Preserve native left-click placement for ground-target spells.
+### Added
+
+- Use held-left steering with W-compatible right-click movement.
+- Keep native left-click placement for ground-target spells.
 - Reapply saved settings after account keybindings finish loading.
-- Keep protected movement calls outside addon Lua and never call `SaveBindings`.
-- Publish the addon ZIP and clean one-file MPQ as separate downloads; users need no EXE or build tools.
-- Keep a source-only builder in the repository for audit and maintenance.
+- Install the addon ZIP and `patch-Z.MPQ` as separate downloads; no EXE or build tool is needed.
+
+### Changed
+
+- Keep protected movement calls in FrameXML and never save keybindings automatically.
 
 ## 0.1.0 — 2026-08-04
 
-- Port Left Interact to Vanilla 1.12.1 and Interface 11200.
-- Replace later-client override bindings with reversible session-only `SetBinding` changes.
+### Added
+
+- Port Left Interact to WoW 1.12 and Interface 11200.
+- Use reversible session-only binding changes.
 - Preserve newer mouse-binding changes made by another addon during normal disable or logout.
 - Preserve original bindings across `/reload` and add `/leftinteract recover`.
-- Support trusted combined movement and the stock `MOVEFORWARD` fallback.
-- Restore native BUTTON1 while an inventory item is attached to the cursor.
-- Keep the settings and What's New pages.
+- Support combined movement and the stock `MOVEFORWARD` fallback.
+- Restore native left click while an inventory item is attached to the cursor.
+- Include settings and What's New pages.

@@ -10,8 +10,8 @@ https://github.com/theShirina/left-interact-vanilla-patch/releases/latest
 2. patch-Z.MPQ
 
 No EXE, Python, or build tool is required.
-No client files or MPQs are included in this addon ZIP. The required clean
-one-file MPQ is a separate release download.
+No client files or MPQs are included in this addon ZIP. The required one-file
+MPQ is a separate release download.
 
 INSTALL
 -------
@@ -35,8 +35,9 @@ FEATURES
 - Held-left steering resumes after right click is released.
 - Ground-target spells use native left-click placement.
 - Native left click returns while an inventory item is attached.
+- Short empty-world clicks clear the current target by default.
 - Choose whether left click attacks living hostile creatures or only selects them.
-- The hostile-creature option switches between separate trusted click actions.
+- The hostile-creature option uses separate protected click actions.
 
 BINDING SAFETY
 --------------
