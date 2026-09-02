@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 — 2026-08-08
+## [0.3.0] - 2026-08-08
 
 ### Added
 
@@ -13,7 +13,7 @@
 - Corpses, hostile players, gathering nodes, and world objects keep their normal interaction behavior.
 - The settings panel is more compact; `/leftinteract recover` remains available.
 
-## 0.2.1 — 2026-08-04
+## [0.2.1] - 2026-08-04
 
 ### Added
 
@@ -26,7 +26,7 @@
 
 - Keep protected movement calls in FrameXML and never save keybindings automatically.
 
-## 0.1.0 — 2026-08-04
+## [0.1.0] - 2026-08-04
 
 ### Added
 
