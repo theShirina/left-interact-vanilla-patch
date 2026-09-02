@@ -69,6 +69,6 @@ It contains no executable, login code, account data, GlueXML, or realm-selection
 
 The addon, tests, validator, release packager, and patch-builder source are in this repository under the MIT license. The patch builder exists for audit and maintenance; release users do not need it.
 
-This repository does **not** contain a game executable, account data, logs, or private client state. The released MPQ contains the one client-compatible binding override required by Left Interact.
+This repository does **not** contain a game executable, account data, logs, or client data. The released MPQ contains the one client-compatible binding override required by Left Interact.
 
 This project targets WoW 1.12 and Interface 11200. World of Warcraft and Blizzard FrameXML are owned by Blizzard Entertainment.
